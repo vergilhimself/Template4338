@@ -46,6 +46,9 @@ namespace Template4338
             // Подключение к базе данных с использованием EF
             using (var db = new MyDbContext())
             {
+                Database database = db.Database;
+                
+
                 int numberOfRowDeleted = db.Database.ExecuteSqlCommand("Truncate table Tables");
 
                 for (int i = 2; i <= rowCount; i++)
@@ -59,9 +62,10 @@ namespace Template4338
                         if (xlRange.Cells[i, j] != null && xlRange.Cells[i, j].Value != null)
                         {
 
-                            PropertyDescriptor property = descr[j-1];
+                            PropertyDescriptor property = descr[j];
                             switch (property.Name) {
-                                case "Id": continue;
+                                case "Id": ; continue;
+
                                 default:
                                     property.SetValue(myTable, System.Convert.ToString(xlRange.Cells[i, j].Value.ToString())); 
                                     break;

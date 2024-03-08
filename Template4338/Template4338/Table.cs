@@ -17,6 +17,13 @@ namespace Template4338
     {
         public int Id { get; set; }
         public string FullName { get; set; }
+        public string ClientId {get; set; }
+        public string BirthDate { get; set; }
+        public string Index { get; set; }
+        public string City { get; set; }
+        public string Street { get; set; }
+        public string Home { get; set; }
+        public string Apartment { get; set; }
         public string Email { get; set; }
     }
 }
