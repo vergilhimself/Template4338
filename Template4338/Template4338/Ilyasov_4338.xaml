@@ -8,5 +8,7 @@
         Title="WindowInfo" Height="450" Width="800">
     <Grid>
         <Label Content="Ilyasov 4338" HorizontalAlignment="Left" Margin="90,60,0,0" VerticalAlignment="Top" Height="59" Width="219" FontSize="36"/>
+        <Button Content="Import" HorizontalAlignment="Left" Margin="90,124,0,0" VerticalAlignment="Top" Height="36" Width="80" Click="ImportClick"/>
+        <Button Content="Export" HorizontalAlignment="Left" Margin="229,124,0,0" VerticalAlignment="Top" Height="36" Width="80" Click="ExportClick"/>
     </Grid>
 </Window>
