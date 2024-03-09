@@ -37,3 +37,5 @@ C:\Users\fidan\OneDrive\Рабочий стол\lab3\Template4338\Template4338\T
 C:\Users\fidan\OneDrive\Рабочий стол\lab3\Template4338\Template4338\Template4338\obj\Debug\Template4338.csproj.CopyComplete
 C:\Users\fidan\OneDrive\Рабочий стол\lab3\Template4338\Template4338\Template4338\obj\Debug\Template4338.exe
 C:\Users\fidan\OneDrive\Рабочий стол\lab3\Template4338\Template4338\Template4338\obj\Debug\Template4338.pdb
+C:\Users\fidan\OneDrive\Рабочий стол\lab3\Template4338\Template4338\Template4338\bin\Debug\Aspose.Cells.dll
+C:\Users\fidan\OneDrive\Рабочий стол\lab3\Template4338\Template4338\Template4338\bin\Debug\Aspose.Cells.xml

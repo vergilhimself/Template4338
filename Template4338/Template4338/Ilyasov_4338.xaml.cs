@@ -17,13 +17,15 @@ using System.Data.Entity;
 using System.IO;
 using System.ComponentModel;
 using System.Reflection;
-
+//using Aspose.Cells;
+using System.Data;
+using Microsoft.Office.Interop.Excel;
 namespace Template4338
 {
     /// <summary>
     /// Логика взаимодействия для WindowInfo.xaml
     /// </summary>
-    public partial class _4338_Ilyasov : Window
+    public partial class _4338_Ilyasov : System.Windows.Window
     {
         public _4338_Ilyasov()
         {
@@ -90,6 +92,47 @@ namespace Template4338
             Marshal.ReleaseComObject(xlWorkbook);
             Marshal.ReleaseComObject(xlApp);
         }
+
+        static void Export()
+        {
+            
+            var excelApp = new Excel.Application();
+            Excel.Workbook workbook = excelApp.Workbooks.Add(Type.Missing);
+            Excel._Worksheet worksheet = workbook.Sheets[1];
+            worksheet.Name = "ExportedFromDatatable";
+            using (var db = new MyDbContext())
+            {
+                int k = 1;
+                int j = 1;
+                var data = db.Database.SqlQuery<Table>("SELECT * FROM Tables ORDER BY FullName; ");
+                foreach (var d in data)
+                {
+                    worksheet.Cells[j,k] = d.ClientId.ToString();
+                    j++;
+                }
+                j = 1;
+                k = 2;
+                data = db.Database.SqlQuery<Table>("SELECT * FROM Tables ORDER BY FullName; ");
+                foreach (var d in data)
+                {
+                    worksheet.Cells[j,k] = d.Email.ToString();
+                    j++;
+                }
+                j = 1;
+                k = 3;
+                data = db.Database.SqlQuery<Table>("SELECT * FROM Tables ORDER BY FullName; ");
+                foreach (var d in data)
+                {
+                    worksheet.Cells[j, k] = d.FullName.ToString();
+                    j++;
+                }
+            }
+            string path = AppDomain.CurrentDomain.BaseDirectory;
+            path += "4.xlsx";
+            workbook.SaveAs(@path);
+            workbook.Close();
+            excelApp.Quit();
+        }
         private void ImportClick(object sender, RoutedEventArgs e)
         {
             Import();
@@ -97,7 +140,7 @@ namespace Template4338
 
         private void ExportClick(object sender, RoutedEventArgs e)
         {
-
+            Export();
         }
     }
 }
