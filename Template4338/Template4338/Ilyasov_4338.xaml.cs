@@ -1,26 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Xml;
-using Excel = Microsoft.Office.Interop.Excel;
+﻿using Microsoft.Office.Interop.Excel;
+using System;
+using System.ComponentModel;
 using System.Data.Entity;
 using System.IO;
-using System.ComponentModel;
-using System.Reflection;
+using System.Linq;
+using System.Runtime.InteropServices;
 //using Aspose.Cells;
-using System.Data;
-using Microsoft.Office.Interop.Excel;
+using System.Text.Json;
+using System.Windows;
+using System.Windows.Controls.Primitives;
+using Excel = Microsoft.Office.Interop.Excel;
+using Word = Microsoft.Office.Interop.Word;
+
 namespace Template4338
+
 {
     /// <summary>
     /// Логика взаимодействия для WindowInfo.xaml
@@ -49,7 +42,7 @@ namespace Template4338
             using (var db = new MyDbContext())
             {
                 Database database = db.Database;
-                
+
 
                 int numberOfRowDeleted = db.Database.ExecuteSqlCommand("Truncate table Tables");
 
@@ -65,21 +58,25 @@ namespace Template4338
                         {
 
                             PropertyDescriptor property = descr[j];
-                            switch (property.Name) {
-                                case "Id": ; continue;
+                            switch (property.Name)
+                            {
+                                case "Id":; continue;
 
                                 default:
-                                    property.SetValue(myTable, System.Convert.ToString(xlRange.Cells[i, j].Value.ToString())); 
+                                    property.SetValue(myTable, System.Convert.ToString(xlRange.Cells[i, j].Value.ToString()));
                                     break;
                             }
-                            
+
                         }
                     }
                     // Добавление объекта в контекст EF
                     db.Tables.Add(myTable);
                 }
+
                 // Сохранение изменений в базе данных
                 db.SaveChanges();
+                int numberOfRowDeleted3 = db.Database.ExecuteSqlCommand("DELETE FROM Tables WHERE (ClientId IS NULL)");
+
             }
 
             // Очистка
@@ -95,7 +92,7 @@ namespace Template4338
 
         static void Export()
         {
-            
+
             var excelApp = new Excel.Application();
             Excel.Workbook workbook = excelApp.Workbooks.Add(Type.Missing);
             Excel._Worksheet worksheet = workbook.Sheets[1];
@@ -109,7 +106,7 @@ namespace Template4338
                 var data = db.Database.SqlQuery<Table>("SELECT * FROM Tables ORDER BY FullName; ");
                 foreach (var d in data)
                 {
-                    worksheet.Cells[j,k] = d.ClientId.ToString();
+                    worksheet.Cells[j, k] = d.ClientId.ToString();
                     j++;
                 }
                 j = 1;
@@ -117,7 +114,7 @@ namespace Template4338
                 data = db.Database.SqlQuery<Table>("SELECT * FROM Tables ORDER BY FullName; ");
                 foreach (var d in data)
                 {
-                    worksheet.Cells[j,k] = d.Email.ToString();
+                    worksheet.Cells[j, k] = d.Email.ToString();
                     j++;
                 }
                 j = 1;
@@ -147,11 +144,70 @@ namespace Template4338
 
         private void ImportJSON(object sender, RoutedEventArgs e)
         {
+            string path = AppDomain.CurrentDomain.BaseDirectory;
+            path += "3.json";
+
+            // Чтение содержимого файла JSON в строку
+            using (var db = new MyDbContext())
+            {
+                using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
+                {
+                    TableJSON tableJSON = new TableJSON();
+                    var jsonTable = new TableJSON();
+                    foreach (TableJSON jSON in JsonSerializer.Deserialize<TableJSON[]>(fs))
+                    {
+                        db.TablesJSON.Add(jSON);
+                    };
+
+                }
+                // Сохранение изменений в базе данных
+                db.SaveChanges();
+            }
+
 
         }
         private void ExportWord(object sender, RoutedEventArgs e)
         {
+            Word.Application wordApp = new Word.Application();
+            Word.Document wordDoc = wordApp.Documents.Add();
+            using (var db = new MyDbContext())
+            {
+                var data = db.Database.SqlQuery<StreetTable>("select distinct Street from TableJSONs;");
+                foreach (var row in data)
+                {
+                    
+                    string query = "SELECT * FROM TableJSONs where Street like N'%" + Convert.ToString(row.Street) + "%' ORDER BY FullName";
+                    Console.WriteLine(query);
+                    var data2 = db.Database.SqlQuery<TableJSON>(query);
+                    int count = db.TablesJSON.Count(p => p.Street.Contains(row.Street));
+                    object what = Word.WdGoToItem.wdGoToPage;
+                    object which = Word.WdGoToDirection.wdGoToFirst;
+                    object countpage = 1;
+                    Word.Range startOfPageRange = wordDoc.GoTo(ref what, ref which, ref countpage);
+                    
+                    Word.Table wordTable = wordDoc.Tables.Add(wordApp.Selection.Range, count, 3);
 
+                    int currentRow = 1; // Начинаем с первой строки
+                    foreach (var row2 in data2)
+                    {
+                        wordTable.Cell(currentRow, 1).Range.Text = row2.CodeClient;
+                        Console.WriteLine(row2.CodeClient);
+                        wordTable.Cell(currentRow, 2).Range.Text = row2.FullName;
+                        wordTable.Cell(currentRow, 3).Range.Text = row2.E_mail;
+                        currentRow++; // Переходим к следующей строке
+                    }
+
+                   
+
+                    // Добавление разрыва страницы после таблицы
+                    startOfPageRange.InsertBreak(Word.WdBreakType.wdPageBreak);
+                }
+            }
+            string path = AppDomain.CurrentDomain.BaseDirectory;
+            path += "4.docx";
+            wordDoc.SaveAs(@path);
+            wordDoc.Close();
+            wordApp.Quit();
         }
     }
 }
