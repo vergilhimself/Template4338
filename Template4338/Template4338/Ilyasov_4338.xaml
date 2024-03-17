@@ -10,5 +10,7 @@
         <Label Content="Ilyasov 4338" HorizontalAlignment="Left" Margin="90,60,0,0" VerticalAlignment="Top" Height="59" Width="219" FontSize="36"/>
         <Button Content="Import" HorizontalAlignment="Left" Margin="90,124,0,0" VerticalAlignment="Top" Height="36" Width="80" Click="ImportClick"/>
         <Button Content="Export" HorizontalAlignment="Left" Margin="229,124,0,0" VerticalAlignment="Top" Height="36" Width="80" Click="ExportClick"/>
+        <Button Content="Import JSON" HorizontalAlignment="Left" Margin="90,184,0,0" VerticalAlignment="Top" Height="33" Width="80" Click="ImportJSON"/>
+        <Button Content="Export Word" HorizontalAlignment="Left" Margin="229,184,0,0" VerticalAlignment="Top" Height="33" Width="80" Click="ExportWord"/>
     </Grid>
 </Window>

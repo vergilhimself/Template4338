@@ -104,6 +104,8 @@ namespace Template4338
             {
                 int k = 1;
                 int j = 1;
+                int numberOfRowDeleted = db.Database.ExecuteSqlCommand("DELETE FROM Tables WHERE (ClientId IS NULL)");
+
                 var data = db.Database.SqlQuery<Table>("SELECT * FROM Tables ORDER BY FullName; ");
                 foreach (var d in data)
                 {
@@ -141,6 +143,15 @@ namespace Template4338
         private void ExportClick(object sender, RoutedEventArgs e)
         {
             Export();
+        }
+
+        private void ImportJSON(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void ExportWord(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
