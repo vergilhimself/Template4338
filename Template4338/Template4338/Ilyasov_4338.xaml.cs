@@ -95,9 +95,40 @@ namespace Template4338
 
             var excelApp = new Excel.Application();
             Excel.Workbook workbook = excelApp.Workbooks.Add(Type.Missing);
-            Excel._Worksheet worksheet = workbook.Sheets[1];
-            worksheet.Name = "ExportedFromDatatable";
+            Excel._Worksheet worksheet1 = workbook.Sheets[1];
+            worksheet1.Name = "ExportedFromDatatable";
+            worksheet1.Cells[1, 1] = "Вывод данных по улицам: Код клиента/Почта/ФИО";
+
             using (var db = new MyDbContext())
+            {
+                var data = db.Database.SqlQuery<StreetTable>("select distinct Street from Tables;");
+                int k = 1;
+                foreach (var row in data)
+                {
+
+                    string query = "SELECT * FROM Tables where Street like N'%" + Convert.ToString(row.Street) + "%' ORDER BY FullName";
+                    Console.WriteLine(query);
+                    var data2 = db.Database.SqlQuery<Table>(query);
+                    int count = db.TablesJSON.Count(p => p.Street.Contains(row.Street));
+                    Excel.Worksheet worksheet = (Worksheet)workbook.Sheets.Add();
+                    
+
+                    int currentRow = 2; // Начинаем с первой строки
+                    
+                    foreach (var row2 in data2)
+                    {
+                        worksheet.Name = row2.Street;
+                        worksheet.Cells[1, 1] = row2.Street;
+                        worksheet.Cells[currentRow, 1] = row2.ClientId.ToString();
+                        worksheet.Cells[currentRow, 2] = row2.Email.ToString();
+                        worksheet.Cells[currentRow, 3] = row2.FullName.ToString();                                               
+                        currentRow++; // Переходим к следующей строке
+                    }
+
+                    k++;
+                }
+            }
+            /*using (var db = new MyDbContext())
             {
                 int k = 1;
                 int j = 1;
@@ -125,7 +156,7 @@ namespace Template4338
                     worksheet.Cells[j, k] = d.FullName.ToString();
                     j++;
                 }
-            }
+            }*/
             string path = AppDomain.CurrentDomain.BaseDirectory;
             path += "4.xlsx";
             workbook.SaveAs(@path);
@@ -185,7 +216,7 @@ namespace Template4338
                     object countpage = 1;
                     Word.Range startOfPageRange = wordDoc.GoTo(ref what, ref which, ref countpage);
                     
-                    Word.Table wordTable = wordDoc.Tables.Add(wordApp.Selection.Range, count, 3);
+                    Word.Table wordTable = wordDoc.Tables.Add(wordApp.Selection.Range, count, 4);
 
                     int currentRow = 1; // Начинаем с первой строки
                     foreach (var row2 in data2)
@@ -194,6 +225,7 @@ namespace Template4338
                         Console.WriteLine(row2.CodeClient);
                         wordTable.Cell(currentRow, 2).Range.Text = row2.FullName;
                         wordTable.Cell(currentRow, 3).Range.Text = row2.E_mail;
+                        wordTable.Cell(currentRow, 4).Range.Text = row2.Street;
                         currentRow++; // Переходим к следующей строке
                     }
 
